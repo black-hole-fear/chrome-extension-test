@@ -1,6 +1,6 @@
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     console.log("Message received in background script: ", message);
-
+    
     sendResponse({response: "Message received successfully!"});
 });
 
@@ -9,3 +9,5 @@ function handleButtonClick() {
 }
 
 chrome.action.onClicked.addListener(handleButtonClick);
+
+importScripts('./options_script.js');
