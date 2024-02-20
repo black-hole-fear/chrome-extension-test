@@ -25,11 +25,16 @@ async function stopRecording() {
 	window.location.hash = '';
 }
 
-function startCapture() {
+async function startCapture() {
+	// let gArrTestValue = await chrome.storage.local.get(['test']);
+	// gArrTestValue.test({"test SessionData in frontend"});
+	// await chrome.storage.local.set("test", gArrTestValue);
 	chrome.runtime.sendMessage({ name: 'initiateRecording' });
 }
 
-function stopCapture() {
+async function stopCapture() {
+	const strPrint = await chrome.storage.local.get(["test"]);
+	console.log(`local value:${strPrint}`);
 	chrome.runtime.sendMessage({ name: 'stopRecording' });
 }
 

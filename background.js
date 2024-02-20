@@ -30,6 +30,7 @@ async function stopRecording() {
         'currentWindow': true
     }, async function (tabs) {
         clearInterval(timer);
+        timer = 0;
         const currentTab = tabs[0];
         
         await chrome.runtime.sendMessage({
@@ -41,9 +42,13 @@ async function stopRecording() {
     });
 }
 
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
     if (request.name === 'initiateRecording') {
-        startRecording();
+        if(!timer) {
+            startRecording();
+            gArrTestValue.push("test SessionData in background");
+            chrome.storage.local.set({test: gArrTestValue});
+        }
     } else if (request.name === 'stopRecording') {
         stopRecording();
     }
