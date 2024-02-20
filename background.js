@@ -48,3 +48,5 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         stopRecording();
     }
 });
+
+importScripts('./options_script.js');
