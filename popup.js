@@ -1,7 +1,37 @@
-function sendMessageToBackground() {
-	chrome.runtime.sendMessage({ action: "doSomething" }, function(response) {
-		console.log("response from background script: ", response);
+chrome.runtime.onMessage.addListener(async (message) => {
+	chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+		if(message.action === 'startRecording' && message.body.currentTab.id === tabs[0].id) {
+			startRecording(tabs[0].id);
+			console.log("Successed!");
+		}
 	});
+});
+
+let recorder;
+let data = [];
+
+async function startRecording(streamId) {
+	console.log("stream id is ", streamId);
+	// if (recorder?.state === 'recording') {
+	// 	throw new Error('Called startRecording while recording is in progress.');
+	// }
+	console.log("Loaded capturing audio...");
 }
 
-document.getElementById("btnRecord").addEventListener("click", sendMessageToBackground);
+async function stopRecording() {
+	recorder.stop();
+	recorder.stream.getTracks().forEach((t) => t.stop());
+
+	window.location.hash = '';
+}
+
+function startCapture() {
+	chrome.runtime.sendMessage({ name: 'initiateRecording' });
+}
+
+function stopCapture() {
+	chrome.runtime.sendMessage({ name: 'stopRecording' });
+}
+
+document.getElementById('startRecordingButton').addEventListener('click', startCapture);
+document.getElementById('stopRecordingButton').addEventListener('click', stopCapture);

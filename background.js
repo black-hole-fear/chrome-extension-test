@@ -1,13 +1,50 @@
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    console.log("Message received in background script: ", message);
-    
-    sendResponse({response: "Message received successfully!"});
-});
+let timer = 0;
 
-function handleButtonClick() {
-    console.log("Button clicked in background script!!!!!");
+async function startRecording() {
+    await chrome.tabs.query({
+        'active': true,
+        'lastFocusedWindow': true,
+        'currentWindow': true
+    }, async function (tabs) {
+        const currentTab = tabs[0];
+
+        let counter = 0;
+        timer = setInterval(() => {
+            counter += 1;
+            console.log('timecounter:', counter);
+        }, 1000);
+        
+        await chrome.runtime.sendMessage({
+            action: 'startRecording',
+            body: {
+                currentTab: currentTab
+            }
+        });
+    });
 }
 
-chrome.action.onClicked.addListener(handleButtonClick);
+async function stopRecording() {
+    await chrome.tabs.query({
+        'active': true,
+        'lastFocusedWindow': true,
+        'currentWindow': true
+    }, async function (tabs) {
+        clearInterval(timer);
+        const currentTab = tabs[0];
+        
+        await chrome.runtime.sendMessage({
+            action: 'stopRecording',
+            body: {
+                currentTab: currentTab
+            }
+        });
+    });
+}
 
-importScripts('./options_script.js');
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request.name === 'initiateRecording') {
+        startRecording();
+    } else if (request.name === 'stopRecording') {
+        stopRecording();
+    }
+});
