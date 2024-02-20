@@ -2,7 +2,8 @@ chrome.runtime.onMessage.addListener(async (message) => {
 	chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
 		if(message.action === 'startRecording' && message.body.currentTab.id === tabs[0].id) {
 			startRecording(tabs[0].id);
-			console.log("Successed!");
+		} else if(message.action === 'stopRecording' && message.body.currentTab.id === tabs[0].id) {
+			stopRecording();
 		}
 	});
 });
@@ -19,22 +20,18 @@ async function startRecording(streamId) {
 }
 
 async function stopRecording() {
-	recorder.stop();
-	recorder.stream.getTracks().forEach((t) => t.stop());
-
-	window.location.hash = '';
+	const response = await chrome.storage.local.get('test');
+	console.log("Final Result: ", response.test);
 }
 
 async function startCapture() {
-	// let gArrTestValue = await chrome.storage.local.get(['test']);
-	// gArrTestValue.test({"test SessionData in frontend"});
-	// await chrome.storage.local.set("test", gArrTestValue);
+	let arrTemp = [];
+	arrTemp.push("test SessionData in frontend");
+	await chrome.storage.local.set({'test': arrTemp});
 	chrome.runtime.sendMessage({ name: 'initiateRecording' });
 }
 
 async function stopCapture() {
-	const strPrint = await chrome.storage.local.get(["test"]);
-	console.log(`local value:${strPrint}`);
 	chrome.runtime.sendMessage({ name: 'stopRecording' });
 }
 
